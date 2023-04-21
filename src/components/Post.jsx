@@ -1,37 +1,46 @@
+import { format, formatDistanceToNow } from 'date-fns';
+import ptBR from 'date-fns/locale/pt-BR';
 import { Avatar } from "./Avatar";
 import { Comment } from "./Comment";
 import styles from "./Post.module.css";
 
-export function Post(props) {
+export function Post({ author, publishedAt, content }) {
+  const publishedDateFormatted = format(publishedAt, "d 'de' LLLL 'às' HH:mm'h'", {
+    locale: ptBR
+  })
+
+  const publishedDateRelativeToNow = formatDistanceToNow(publishedAt, {
+    locale: ptBR,
+    addSuffix: true
+  })
+
   return (
     <article className={styles.post}>
       <header>
         <div className={styles.author}>
-          <Avatar src="https://github.com/marinapsvreis.png"/>
+          <Avatar src={author.avatarUrl}/>
           <div className={styles.authorInfo}>
-            <strong>{props.author}</strong>
-            <span>{props.role}</span>
+            <strong>{author.name}</strong>
+            <span>{author.role}</span>
           </div>
         </div>
 
-        <time title="21 de Abril às 09:17h" dateTime="2023-04-21:09:17:00">
-          Publicado há 1h
+        <time title={publishedDateFormatted} dateTime={publishedAt.toISOString()}>
+          {publishedDateRelativeToNow}
         </time>
       </header>
 
       <div className={styles.content}>
         <div>
-          <p>Fala pessoal 👋</p>
-          <p>
-            Finalmente finalizei meu novo site/portfólio. Foi um baita desafio
-            criar todo o design e codar na unha, mas consegui 💪🏻{" "}
-          </p>
-          <p>
-            <a href="">Acesse e deixe seu feedback 👉 devonlane.design</a>
-          </p>
-          <p>
-            <a href="">#uiux</a> <a href="">#userexperience</a>
-          </p>
+          {content.map(line => {
+            if(line.type === "paragraph"){
+              return <p key={line.content}>{line.content}</p>
+            }
+
+            if(line.type === "link"){
+              return <p key={line.content}><a href="">{line.content}</a></p>
+            }
+          })}
         </div>
       </div>
 
